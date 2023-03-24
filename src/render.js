@@ -435,10 +435,34 @@ module.exports = class Render {
         if (field.position.y === 0)
           field.position.y += this.printerFileLine;
 
+        let fieldRepeatCount = 1;
+        let lastFieldCopyLength = field.length;
+        const fieldName = field.name;
+        const contFieldKeyword = field.keywords.find(keyword => keyword.name === `CNTFLD`);
+        if (contFieldKeyword) {
+          fieldRepeatCount = Math.ceil(field.length / Number(contFieldKeyword.value));
+          lastFieldCopyLength = field.length % Number(contFieldKeyword.value);
+          if (lastFieldCopyLength === 0) {
+            lastFieldCopyLength = Number(contFieldKeyword.value);
+          }
+          field.length = Number(contFieldKeyword.value);
+        }
+
         if (canDisplay) {
-          const content = this.getContent(field);
-          css += content.css;
-          body += content.body;
+          while (fieldRepeatCount > 0) {
+            if (fieldRepeatCount > 1) {
+              field.name = `${fieldName}_0${fieldRepeatCount}`;
+            }
+            const content = this.getContent(field);
+            css += content.css;
+            body += content.body;
+            field.position.y++;
+            fieldRepeatCount--;
+            if (fieldRepeatCount === 1) {
+              field.length = lastFieldCopyLength;
+              field.name = fieldName;
+            }
+          }
         }
 
         if (spaceAfter) {
