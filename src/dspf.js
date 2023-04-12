@@ -80,8 +80,12 @@ class DisplayFile {
           }
 
           let totalX = Number(x);
+          let totalY = 0;
           if (x.startsWith(`+`)) {
-            totalX = this.currentFields[this.currentFields.length - 1].position.x + Number(x.substring(1));
+            totalX = this.currentFields[this.currentFields.length - 1].position.x +
+                     this.currentFields[this.currentFields.length - 1].length +
+                     Number(x.substring(1));
+            totalY = this.currentFields[this.currentFields.length - 1].position.y;
 
             if (this.currentFields[this.currentFields.length - 1].value) {
               totalX += this.currentFields[this.currentFields.length - 1].value.length;
@@ -91,7 +95,7 @@ class DisplayFile {
           this.currentField = new FieldInfo();
           this.currentField.position = {
             x: totalX,
-            y: 0
+            y: totalY
           };
         }
         
